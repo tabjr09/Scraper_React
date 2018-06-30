@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import Jumbotron from "../../components/Jumbotron";
+//import Jumbotron from "../../components/Jumbotron";
 import SaveBtn from "../../components/SaveBtn";
+import DeleteBtn from "../../components/DeleteBtn";
 import API from "../../utils/API";
 import { Col, Row, Container } from "../../components/Grid";
 import { List, ListItem } from "../../components/List";
@@ -10,6 +11,7 @@ class Books extends Component {
   // Setting our component's initial state
   state = {
     articles: [],
+    savedarticles: [],
     topic: "",
     startyear: "",
     endyear: ""
@@ -21,20 +23,49 @@ class Books extends Component {
   // }
 
   // Loads all books  and sets them to this.state.books
+  // loadSavedArticles = () => {
+  //   API.getArticles()
+  //     .then(res =>
+  //       this.setState({ books: res.data, title: "", author: "", synopsis: "" })
+  //     )
+  //     .catch(err => console.log(err));
+  // };
+
   loadSavedArticles = () => {
-    API.getArticles()
-      .then(res =>
-        this.setState({ books: res.data, title: "", author: "", synopsis: "" })
-      )
-      .catch(err => console.log(err));
-  };
+    API.getArticles('/api/articles')
+    .then(res => {
+      this.setState({
+        savedarticles: [...res.data]})
+    });
+  }
 
   // Deletes a book from the database with a given id, then reloads books from the db
-  saveArticle = id => {
-    API.saveArticle(id)
-      .then(res => this.loadSavedArticles())
-      .catch(err => console.log(err));
-  };
+  // saveArticle = event => {
+  //   API.saveArticle()
+  //     .then(res => this.loadSavedArticles())
+  //     .catch(err => console.log(err));
+  // };
+
+
+  saveArticle = article => {
+
+   // console.log(article);
+
+    const articledata = {
+      title: article.headline.main,
+      url: article.web_url
+    }
+    console.log(articledata);
+    API.saveArticle(articledata)
+    .then(res => {
+      console.log(res.data);
+      this.setState({
+        savedarticles: [...res.data.response.docs]
+      })
+      console.log(this.state.savedarticles);
+    }).catch(err => console.log(err));
+
+  }
 
   // Handles updating component state when the user types into the input field
   handleInputChange = event => {
@@ -120,13 +151,29 @@ class Books extends Component {
                     <h3>{article.headline.main}</h3>
                     <p>{article.web_url}</p>
                     <p>{article.pub_date}</p>
-                    <SaveBtn onClick={() => this.saveArticle(article._id)} />
+                    <TextArea/>
+                    <SaveBtn onClick={() => this.saveArticle(article)} />             
                   </ListItem>
                 );
               })}
             </List>
             ) : (
             <h3>No Results to Display</h3>
+            )}
+
+            {this.state.savedarticles.length ? (
+              <List>
+              {this.state.savedarticles.map(article => {
+                return (
+                  <ListItem title={article.title}>
+
+                    <DeleteBtn onClick={() => this.deleteArticle(article._id)} />
+                  </ListItem>
+                );
+              })}
+            </List>
+            ) : (
+            <h3>No Saved Articles to Display</h3>
             )}
 
           </Col>

@@ -13,13 +13,15 @@ export default {
   // deleteBook: function(id) {
   //   return axios.delete("/api/books/" + id);
   // },
-  // // Saves a book to the database
-  // saveBook: function(bookData) {
-  //   return axios.post("/api/books", bookData);
-  // },
+  // Saves an article to the database
+  saveArticle: function(articleData) {
+    console.log("save article api");
+    return axios.post("/api/articles", articleData);
+  },
   getArticles: function(articleData) {
     //console.log("get articles");
     //console.log(articleData);
     return axios.get( articleData);
   }
+
 };
